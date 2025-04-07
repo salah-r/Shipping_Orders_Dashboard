@@ -83,10 +83,10 @@ export class CerateUpdateAccountComponent {
 
     this.userForm.patchValue({
       // password: this.user?.password || '',
-      // shippingAddress: this.user?.shippingAddress || '',
+      shippingAddress: this.user?.shippingAddress || '',
       email: this.user?.email || '',
       firstName: this.user?.firstName || '',
-      // phone: this.user?.phone || '',
+      phone: this.user?.phoneNumber || '',
       lastName: this.user?.lastName || '',
     });
   }
@@ -107,12 +107,13 @@ export class CerateUpdateAccountComponent {
         this.viewPass = false
 
         const editBody = {
-          email: this.email.value,
+
           firstName: this.firstName.value,
-          // lastName: this.firstName.value,
-          // password: this.password.value,
-          // shippingAddress: this.shippingAddress.value,
-          // phone: this.phone.value
+          lastName: this.firstName.value,
+          email: this.email.value,
+          phone: this.phone.value,
+          shippingAddress: this.shippingAddress.value
+
         };
         // update func
         this.accountService.editUser(this.user.id, editBody).subscribe({
@@ -126,7 +127,7 @@ export class CerateUpdateAccountComponent {
             this.messageService.add({
               severity: 'success',
               summary: 'Successful',
-              detail: 'Category Updated',
+              detail: 'user Updated',
               life: 3000,
             });
           },
@@ -151,7 +152,7 @@ export class CerateUpdateAccountComponent {
               this.messageService.add({
                 severity: 'success',
                 summary: 'Successful',
-                detail: 'Category Created',
+                detail: 'user Created',
                 life: 3000,
               });
             },

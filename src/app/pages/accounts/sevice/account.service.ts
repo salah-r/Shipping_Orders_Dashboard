@@ -33,7 +33,7 @@ export class AccountService {
     return this.apiService.updateData(this.endPoint, id, data);
   }
 
-  deleteUser(id: number) {
-    return this.apiService.deleteUser(this.endPoint, id);
+  deleteUser(id: number, data: any) {
+    return this.apiService.deleteUser(this.endPoint, id, data);
   }
 }

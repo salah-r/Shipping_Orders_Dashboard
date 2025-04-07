@@ -44,6 +44,7 @@ export class ApiConnService {
       );
   }
 
+
   getDataById(endPoint: string, id: number) {
     return this.http
       .get(`${this.apiurl}/${endPoint}/${id}`, {
@@ -103,6 +104,57 @@ export class ApiConnService {
         })
       );
   }
+
+  deleteMainShipment(endPoint: string, id: any, newData: any) {
+    return this.http
+      .post(
+
+        `${this.apiurl}/${endPoint}/${id}/status`,
+        newData,
+        {
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8',
+            Accept: '*/*',
+            Authorization: 'Bearer ' + this.temp,
+          },
+        }
+      )
+      .pipe(
+        // retry(2),
+        catchError((err) => {
+          console.error(err.error.code);
+          //var code = err.error.code;
+          return throwError(() => new Error(err.error.code));
+        })
+      );
+  }
+  deleteUser(endPoint: string, id: any, newData: any) {
+    return this.http
+      .post(
+
+        `${this.apiurl}/${endPoint}/${id}/toggle-status`,
+        newData,
+        {
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8',
+            Accept: '*/*',
+            Authorization: 'Bearer ' + this.temp,
+          },
+        }
+      )
+      .pipe(
+        // retry(2),
+        catchError((err) => {
+          console.error(err.error.code);
+          //var code = err.error.code;
+          return throwError(() => new Error(err.error.code));
+        })
+      );
+  }
+
+
+
+
   upadteMainShipmentStatus(endPoint: string, id: any, newData: any) {
     return this.http
       .post(
@@ -152,7 +204,7 @@ export class ApiConnService {
 
   updateData(endPoint: string, id: number, updatedData: any) {
     return this.http
-      .put(`${this.apiurl}/${endPoint}/${id}`, updatedData, {
+      .post(`${this.apiurl}/${endPoint}/update/${id}`, updatedData, {
         headers: {
           'Content-Type': 'application/json; charset=utf-8',
           Accept: '*/*',
@@ -168,9 +220,10 @@ export class ApiConnService {
       );
   }
 
-  deleteUser(endPoint: string, id: number) {
+
+  updateMainShipmentData(endPoint: string, id: number, updatedData: any) {
     return this.http
-      .put(`${this.apiurl}/${endPoint}/${id}/toggle-status`, {
+      .post(`${this.apiurl}/${endPoint}/UpdateMainShipment/${id}`, updatedData, {
         headers: {
           'Content-Type': 'application/json; charset=utf-8',
           Accept: '*/*',
@@ -185,6 +238,7 @@ export class ApiConnService {
         })
       );
   }
+
 
   deleteData(endPoint: string, id: number) {
     return this.http

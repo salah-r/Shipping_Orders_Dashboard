@@ -113,6 +113,8 @@ import { ViewAllAccountsComponent } from './pages/accounts/view/view-all-account
 import { ViewAllShipmentsComponent } from './pages/shipments/view/view-all-shipments/view-all-shipments.component';
 import { CreateUpdateShipmentComponent } from './pages/shipments/editors/create-update-shipment/create-update-shipment.component';
 import { ViewShipmentDetailsComponent } from './pages/detailled-shipment/view/view-shipment-details/view-shipment-details.component';
+import { SigninComponent } from './pages/signin/signin/signin.component';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -127,6 +129,7 @@ import { ViewShipmentDetailsComponent } from './pages/detailled-shipment/view/vi
     ViewAllShipmentsComponent,
     CreateUpdateShipmentComponent,
     ViewShipmentDetailsComponent,
+    SigninComponent,
 
 
 

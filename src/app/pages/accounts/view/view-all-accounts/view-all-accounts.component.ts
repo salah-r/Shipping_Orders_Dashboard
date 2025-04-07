@@ -43,16 +43,17 @@ export class ViewAllAccountsComponent {
   }
   deleteUser(user: any) {
     console.log(user.id);
+    let data = {}
     this.confirmationService.confirm({
       message:
         'هل متأكد من مسح العضو ' +
-        user.fristName +
+        user.firstName +
         ' ?',
       header: 'مسح',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.accountService
-          .deleteUser(user.id)
+          .deleteUser(user.id, data)
           .subscribe({
             next: (resposnse) => {
               console.log(resposnse);

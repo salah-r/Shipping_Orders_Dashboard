@@ -73,6 +73,51 @@ export class ViewAllShipmentsComponent {
     }
   }
 
+
+  deleteMainShipment(shipment: any) {
+    console.log(shipment.id);
+    let data = {
+      mainShipmentId: shipment.id,
+      notes: "cancelled",
+      Destination: shipment.destination,
+      status: 7
+    }
+    this.confirmationService.confirm({
+      message:
+        'هل متأكد من مسح الشحنة ' +
+        shipment.trackingNumber +
+        ' ?',
+      header: 'مسح',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.shipmentService
+          .editMainShipment(shipment.id, data)
+          .subscribe({
+            next: (resposnse) => {
+              console.log(resposnse);
+              this.shipments = this.shipments.filter((values) => {
+                values.id !== shipment.id;
+              });
+              this.mainShipment = null;
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Successful',
+                detail: 'تم مسح الشحنة ',
+                life: 3000,
+              });
+
+              this.getAllMainShipments();
+            },
+            error: (err) => {
+              console.log(err);
+            },
+          });
+      },
+    });
+  }
+
+
+
   // deleteSecondaryMember(SubscriptionsPara: any) {
   //   console.log(SubscriptionsPara.id);
   //   this.confirmationService.confirm({

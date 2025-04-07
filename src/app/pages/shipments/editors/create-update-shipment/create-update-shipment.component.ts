@@ -20,6 +20,14 @@ export class CreateUpdateShipmentComponent {
   diffrentPass: boolean;
   viewPass: boolean = true;
   passwordError: string = '';
+  shippingStatus = [{ label: 'Pending', value: 0 }, { label: 'InProgress', value: 1 },
+  { label: 'InTransit', value: 2 }, { label: 'AtCustoms', value: 3 },
+  { label: 'OutForDelivery', value: 4 }, { label: 'Delivered', value: 5 },
+  { label: 'Delayed', value: 6 }, { label: 'Cancelled', value: 7 },
+  ]
+
+
+
   constructor(
     private shipmentService: ShipmentService,
     private fb: FormBuilder, private messageService: MessageService) { }
@@ -97,10 +105,12 @@ export class CreateUpdateShipmentComponent {
         this.viewPass = false
 
         const editBody = {
-          expectedDeliveryDate: this.expectedDeliveryDate.value,
-          // trackingNumber: this.trackingNumber.value,
-          status: this.status.value,
+          mainShipmentDto: {
+            expectedDeliveryDate: this.expectedDeliveryDate.value,
+            status: this.status.value,
+          },
           destination: this.destination.value,
+          // trackingNumber: this.trackingNumber.value,
         };
         // update func
         this.shipmentService.editMainShipment(this.mainShipment.id, editBody).subscribe({

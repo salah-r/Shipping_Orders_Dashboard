@@ -29,14 +29,17 @@ export class ShipmentService {
     return this.apiService.addData(this.endPoint, data);
   }
 
+
   editMainShipment(id: number, data: any) {
-    return this.apiService.updateData(this.endPoint, id, data);
+    return this.apiService.updateMainShipmentData(this.endPoint, id, data);
   }
+
+
   updateStatus(id: number, data: any) {
     return this.apiService.upadteMainShipmentStatus(this.endPoint, id, data);
   }
 
-  deleteMainShipment(id: number) {
-    return this.apiService.deleteUser(this.endPoint, id);
+  deleteMainShipment(id: number, data: any) {
+    return this.apiService.deleteMainShipment(this.endPoint, id, data);
   }
 }

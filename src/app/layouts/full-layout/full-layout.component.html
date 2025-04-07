@@ -1,4 +1,4 @@
-<div class="main-content tw-flex tw-h-screen">
+<div *ngIf="hideScrollbar==false" class="main-content tw-flex tw-h-screen">
   <!-- Sidebar -->
   <div [ngClass]="{ expanded: isSidebarExpanded }" class="sidebar tw-h-full tw-transition-all tw-duration-300">
     <app-sidebar [isSidebarExpanded]="isSidebarExpanded" (toggle)="toggleSidebar()"></app-sidebar>
@@ -28,4 +28,9 @@
       </div> -->
     </div>
   </div>
+</div>
+
+<div *ngIf="hideScrollbar==true">
+
+  <app-signin></app-signin>
 </div>
