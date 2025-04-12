@@ -9,6 +9,9 @@ export class AccountService {
 
   endPoint: string = 'api/users';
 
+  getAllUsersForFristOne(Token: any) {
+    return this.apiService.fristGetData(`${this.endPoint}`, Token);
+  }
   getAllUsers() {
     return this.apiService.getData(`${this.endPoint}`);
   }

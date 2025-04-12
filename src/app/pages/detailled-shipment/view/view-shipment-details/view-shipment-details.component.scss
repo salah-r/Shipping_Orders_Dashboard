@@ -240,3 +240,8 @@ td {
   font-size: 9px;
   color: rgba($color: #2A2A2A, $alpha: .6);
 }
+
+
+::ng-deepbutton.p-ripple.p-element.p-dialog-header-icon.p-dialog-header-close.p-link.ng-star-inserted {
+  display: none;
+}

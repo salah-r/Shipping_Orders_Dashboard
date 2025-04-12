@@ -2,6 +2,7 @@ import { AuthService } from 'src/app/services/authService/auth.service';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { environment } from 'src/environment/environment';
 @Component({
   selector: 'app-signin',
   templateUrl: './signin.component.html',
@@ -96,7 +97,9 @@ export class SigninComponent {
 
       this.authService.login(this.loginForm.value).subscribe({
         next: (response) => {
-          console.log(response);
+          console.log(response.token);
+          localStorage.setItem('auth_token', response.token)
+          environment.Token = response.token
 
           this.router.navigate(['/accounts']);
         },

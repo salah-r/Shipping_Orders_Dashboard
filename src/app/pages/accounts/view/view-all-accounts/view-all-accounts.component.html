@@ -9,7 +9,11 @@
           <div class="search-container">
             <div class="search-bar">
               <div class="settings-icon">
-                <img class="pointer" src="../../../../../assets/images/filter.png" alt="">
+
+
+                <p-dropdown (onChange)="getUserID($event)" [options]="filtersList"
+                  class="tw-w-full tw-p-2 tw-border tw-rounded"></p-dropdown>
+                <!-- <img class="pointer" src="../../../../../assets/images/filter.png" alt=""> -->
               </div>
 
               <div class="divider"></div>
@@ -17,7 +21,7 @@
 
               <img src="../../../../../assets/images/search.png" alt="">
 
-              <input type="text" class="search-input" placeholder="بحث...">
+              <input type="text" class="search-input" (input)="onUsersFiter($event)" placeholder="بحث...">
 
 
 
@@ -30,7 +34,7 @@
       </ng-template>
     </p-toolbar>
 
-    <p-table #dt [value]="users" [rows]="7" [paginator]="true"
+    <p-table #dt [value]="filteredUsers" [rows]="7" [paginator]="true"
       [globalFilterFields]="['firstName', 'email', 'id', 'address']" styleClass="p-datatable-striped">
 
 

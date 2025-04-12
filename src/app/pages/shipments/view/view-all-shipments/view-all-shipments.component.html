@@ -9,7 +9,10 @@
           <div class="search-container">
             <div class="search-bar">
               <div class="settings-icon">
-                <img class="pointer" src="../../../../../assets/images/filter.png" alt="">
+                <!-- <img class="pointer" src="../../../../../assets/images/filter.png" alt=""> -->
+
+                <p-dropdown (onChange)="getFilterMethod($event)" [options]="filtersList"
+                  class="tw-w-full tw-p-2 tw-border tw-rounded"></p-dropdown>
               </div>
 
               <div class="divider"></div>
@@ -17,15 +20,15 @@
 
               <img src="../../../../../assets/images/search.png" alt="">
 
-              <input type="text" class="search-input" placeholder="بحث...">
+              <input type="text" class="search-input" (input)="onMainShipmentFiter($event)" placeholder="بحث...">
 
 
 
             </div>
 
-            <div class="dropdown">
+            <!-- <div class="dropdown">
               <img src="../../../../../assets/images/filter image.png" alt="">
-            </div>
+            </div> -->
           </div>
 
           <button (click)="openNew()" pButton label="إضافة" class="p-button-primary"></button>
@@ -34,7 +37,7 @@
       </ng-template>
     </p-toolbar>
 
-    <p-table #dt [value]="shipments" [rows]="5" [paginator]="true"
+    <p-table #dt [value]="filteredShipments" [rows]="5" [paginator]="true"
       [globalFilterFields]="['trackingNumber', 'email', 'phone', 'address']" styleClass="p-datatable-striped">
 
 
@@ -79,15 +82,22 @@
           <td class="tw-p-2 tw-flex tw-gap-1 tw-items-center tw-justify-center">
             <div class="status">
               <i class="pi pi-circle-on dot-icon"></i>
-              <span *ngIf="mainShipment.status!='Pending'">مكتملة</span>
+              <span *ngIf="mainShipment.status=='Delivered'">مكتملة</span>
               <span *ngIf="mainShipment.status=='Pending'">جارية </span>
+              <span *ngIf="mainShipment.status=='Cancelled'">ملغية </span>
+              <span *ngIf="mainShipment.status=='InProgress'">قيد التقدم </span>
+              <span *ngIf="mainShipment.status=='InTransit'">في الشحن </span>
+              <span *ngIf="mainShipment.status=='AtCustoms'">في الجمارك </span>
+              <span *ngIf="mainShipment.status=='OutForDelivery'">خرج للتسليم </span>
+              <span *ngIf="mainShipment.status=='Delayed'">مؤجلة </span>
 
             </div>
 
           </td>
           <td class="tw-p-2">
             <div class="tw-flex gap-3 tw-justify-center">
-              <img class="pointer " src="../../../../../assets/images/eye.png" alt="">
+              <img (click)="goToExtraShipment(mainShipment)" class="pointer " src="../../../../../assets/images/eye.png"
+                alt="">
               <img (click)="openExtraDialoge(mainShipment)" class="pointer "
                 src="../../../../../assets/images/box-add.png" alt="">
               <img (click)="openStatusDialoge(mainShipment)" class="pointer "
@@ -127,37 +137,47 @@
     </div>
   </ng-template>
 
-  <div class="tw-p-4">
+  <form [formGroup]="extraShipmentForm" style="height: 300px;" class="tw-p-4">
     <div class="tw-space-y-4">
-      <div class="tw-grid tw-grid-cols-3 tw-gap-4">
-        <div class="tw-col-span-1">
+      <div class="tw-grid tw-grid-cols-2 tw-gap-4  tw-mb-10">
+        <!-- <div class="tw-col-span-1">
           <label class="tw-block tw-mb-2 tw-text-right">رقم الشحنة الفرعية</label>
           <input type="text" placeholder="رقم الشحنة الفرعية" class="tw-w-full tw-p-2 tw-border tw-rounded">
-        </div>
+        </div> -->
         <div class="tw-col-span-1">
           <label class="tw-block tw-mb-2 tw-text-right">العميل</label>
-          <input type="text" placeholder="العميل" class="tw-w-full tw-p-2 tw-border tw-rounded">
+          <p-dropdown formControlName="customerId" (onChange)="getUserID($event)" [filter]="true"
+            optionLabel="firstName" filterBy="firstName" [options]="usersList" placeholder="العميل"
+            class="tw-w-full tw-p-2 tw-border tw-rounded"></p-dropdown>
+
         </div>
+
+
       </div>
 
       <div>
-        <div class="tw-text-right tw-mb-2">عنوان التسليم</div>
-        <div class="tw-grid tw-grid-cols-3 tw-gap-4  tw-mb-5">
+        <!-- <div class="tw-text-right tw-mb-2">عنوان التسليم</div> -->
+        <div class="tw-grid tw-grid-cols-1 tw-gap-4  tw-mb-5">
+
+
           <div class="tw-col-span-1">
+            <label class="tw-block tw-mb-2 tw-text-right">العنوان التفصيلي</label>
+            <input formControlName="deliveryAddress" type="text" placeholder="العنوان التفصيلي"
+              class="tw-w-full tw-p-2 tw-border tw-rounded">
+          </div>
+
+          <!-- <div class="tw-col-span-1">
             <label class="tw-block tw-mb-2 tw-text-right">البلد</label>
             <p-dropdown [options]="[]" placeholder="البلد" styleClass="tw-w-full">
             </p-dropdown>
-          </div>
+          </div> -->
 
-          <div class="tw-col-span-1">
+          <!-- <div class="tw-col-span-1">
             <label class="tw-block tw-mb-2 tw-text-right">المحافظة</label>
             <p-dropdown [options]="[]" placeholder="المحافظة" styleClass="tw-w-full">
             </p-dropdown>
-          </div>
-          <div class="tw-col-span-1">
-            <label class="tw-block tw-mb-2 tw-text-right">العنوان التفصيلي</label>
-            <input type="text" placeholder="العنوان التفصيلي" class="tw-w-full tw-p-2 tw-border tw-rounded">
-          </div>
+          </div> -->
+
 
 
         </div>
@@ -167,12 +187,12 @@
     </div>
 
     <div class="tw-mt-6 tw-flex tw-justify-center">
-      <button
+      <button (click)="saveExtraShipment()"
         class=" margin-top tw-w-1/4 tw-bg-orange-500 tw-text-white tw-border-0 tw-py-2 tw-rounded-lg hover:tw-bg-orange-600 tw-transition-colors">
         إضافة
       </button>
     </div>
-  </div>
+  </form>
 
 </p-dialog>
 
@@ -197,6 +217,15 @@
     <div class="tw-space-y-4">
       <div class="tw-grid tw-grid-cols-1 tw-gap-4">
         <div class="tw-col-span-1">
+          <label class="tw-block tw-mb-2 tw-text-right tw-text-lg tw-font-medium">الحالة</label>
+          <p-dropdown (onChange)="getStatus($event)" optionLabel="label" [options]="shippingStatus" placeholder="الحالة"
+            styleClass="tw-w-full tw-bg-gray-50">
+          </p-dropdown>
+        </div>
+
+      </div>
+      <div class="tw-grid tw-grid-cols-1 tw-gap-4">
+        <div class="tw-col-span-1">
           <label class="tw-block tw-mb-2 tw-text-right">المكان</label>
           <input [(ngModel)]="place" type="text" placeholder="المكان" class="tw-w-full tw-p-2 tw-border tw-rounded">
         </div>
@@ -216,7 +245,7 @@
     </div>
 
     <div class="tw-mt-6 tw-flex tw-justify-center">
-      <button (click)="updateShipmentStatus()"
+      <button (click)="updateMainshipmentStatus()"
         class=" margin-top tw-w-1/4 tw-bg-orange-500 tw-text-white tw-border-0 tw-py-2 tw-rounded-lg hover:tw-bg-orange-600 tw-transition-colors">
         إضافة
       </button>

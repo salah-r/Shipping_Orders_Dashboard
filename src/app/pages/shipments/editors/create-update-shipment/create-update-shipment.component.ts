@@ -62,6 +62,16 @@ export class CreateUpdateShipmentComponent {
 
   });
 
+
+  convertTimeFormat(inputTime: string): string {
+    // Parse the input time
+    const date = new Date(inputTime);
+
+    date.setHours(19, 56, 24, 537);
+
+    return date.toISOString();
+  }
+
   // get trackingNumber() {
   //   return this.mainShipmentForm.get('trackingNumber');
   // }
@@ -90,14 +100,19 @@ export class CreateUpdateShipmentComponent {
   saveUser() {
     console.log(this.mainShipmentForm.value);
     console.log(new Date(this.expectedDeliveryDate.value).toISOString());
-    let formmatedTime = new Date(this.expectedDeliveryDate.value).toISOString()
+    const convertedTime = this.convertTimeFormat(this.expectedDeliveryDate.value);
+    console.log(convertedTime);
+
+    let status: any = this.status.value
+    console.log(status);
+
+
 
     if (this.mainShipmentForm.valid) {
       const cerateBody = {
         mainShipmentDto: {
-          expectedDeliveryDate: this.expectedDeliveryDate.value,
-          // trackingNumber: this.trackingNumber.value,
-          status: this.status.value,
+          expectedDeliveryDate: convertedTime,
+          status: status.value,
         },
         destination: this.destination.value,
       };
@@ -105,10 +120,8 @@ export class CreateUpdateShipmentComponent {
         this.viewPass = false
 
         const editBody = {
-          mainShipmentDto: {
-            expectedDeliveryDate: this.expectedDeliveryDate.value,
-            status: this.status.value,
-          },
+          expectedDeliveryDate: convertedTime,
+          status: status.value,
           destination: this.destination.value,
           // trackingNumber: this.trackingNumber.value,
         };

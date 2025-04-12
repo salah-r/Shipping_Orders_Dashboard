@@ -3,6 +3,9 @@ import { Isub } from 'src/app/interfaces/isub';
 import { Table } from 'primeng/table';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ShipmentService } from '../../service/shipment.service';
+import { FormBuilder, Validators } from '@angular/forms';
+import { AccountService } from 'src/app/pages/accounts/sevice/account.service';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -12,6 +15,11 @@ import { ShipmentService } from '../../service/shipment.service';
 })
 export class ViewAllShipmentsComponent {
 
+  shippingStatus = [{ label: 'Pending', value: 0 }, { label: 'InProgress', value: 1 },
+  { label: 'InTransit', value: 2 }, { label: 'AtCustoms', value: 3 },
+  { label: 'OutForDelivery', value: 4 }, { label: 'Delivered', value: 5 },
+  { label: 'Delayed', value: 6 }, { label: 'Cancelled', value: 7 },
+  ]
   shipments: any[];
   mainShipment: any;
   shipmentDailogue: boolean = false;
@@ -25,31 +33,185 @@ export class ViewAllShipmentsComponent {
   notes: any
   place: any
   updatedMainShipment: any;
+  usersList: any[] = [];
+  selectedID: any;
+  selectedStatus: any;
+  mainShimpentStatusUpdateDialog: boolean;
+  filtersList: any[] = ['Destination', 'Tracking Number',]
+  filtringMethod: any;
+  filteredShipments: any[];
+  token: any = localStorage.getItem('auth_token');
+
 
   constructor(
     private confirmationService: ConfirmationService,
     private shipmentService: ShipmentService,
+    private accountService: AccountService,
+    private router: Router,
+    private fb: FormBuilder,
     private messageService: MessageService
   ) { }
 
   ngOnInit(): void {
     // document.addEventListener('keydown', this.handleEscapeKey.bind(this));
     this.getAllMainShipments()
+    this.getAllUsers()
 
   }
 
-  // handleEscapeKey(event: KeyboardEvent) {
-  //   if (event.key === 'Escape') {
-  //     this.closeExtraDialoge();
-  //     this.closeStatusDialoge();
-  //   }
-  // }
+  getUserID(event) {
+    console.log(event.value);
+    this.selectedID = event.value.id
+
+  }
+
+  getAllUsers() {
+    this.accountService.getAllUsers().subscribe({
+      next: (resposnse) => {
+        console.log(resposnse);
+
+        this.usersList = resposnse;
+        // console.log(this.users);
+      },
+      error: (err) => {
+        console.log(err);
+      },
+    });
+  }
+
+
+  getFilterMethod(event: any) {
+    // console.log(event.value);
+    this.filtringMethod = event.value
+
+  }
+
+
+  onMainShipmentFiter(event: any) {
+    // console.log(event.target.value);
+
+
+
+    if (this.filtringMethod == 'Destination') {
+
+      this.filteredShipments = this.shipments.filter((ele: any) => {
+        return String(ele.destination).toLowerCase().includes(event.target.value.toLowerCase());
+      })
+    }
+
+    else if (this.filtringMethod == 'Tracking Number') {
+
+      this.filteredShipments = this.shipments.filter((ele: any) => {
+        return String(ele.trackingNumber).toLowerCase().includes(event.target.value.toLowerCase());
+      })
+
+    }
+
+
+
+
+    if (event.target.value == '') {
+      this.filteredShipments = this.shipments
+    }
+
+
+
+  }
+
+
+
+
+
+  getStatus(event: any) {
+    console.log(event.value);
+    this.selectedStatus = event.value.value
+    console.log(this.selectedStatus);
+  }
+
+  updateMainshipmentStatus() {
+
+    let body = {
+      location: this.place,
+      notes: this.notes,
+      status: this.selectedStatus,
+      mainShipmentId: this.updatedMainShipment.id
+    }
+
+    this.shipmentService.updateStatus(this.updatedMainShipment.id, body).subscribe({
+      next: (res: any) => {
+        console.log(res);
+        this.statusUpdateDialog = false
+        this.getAllMainShipments()
+      },
+      error: (err: any) => {
+        console.log(err);
+
+      }
+    })
+
+
+  }
+
+  extraShipmentForm = this.fb.group({
+
+
+    deliveryAddress: ['', Validators.required],
+    customerId: ['', Validators.required],
+
+  });
+
+  get deliveryAddress() {
+    return this.extraShipmentForm.get('deliveryAddress');
+  }
+  get customerId() {
+    return this.extraShipmentForm.get('customerId');
+  }
+
+
+  saveExtraShipment() {
+    console.log(this.extraShipmentForm.value);
+
+    if (this.extraShipmentForm.valid) {
+      const cerateBody = {
+        mainShipmentId: this.updatedMainShipment.id,
+
+        deliveryAddress: this.deliveryAddress.value,
+        customerId: this.selectedID
+      };
+
+
+
+      this.shipmentService.addExtraShipment(cerateBody, this.updatedMainShipment.id).subscribe({
+        next: (res: any) => {
+          console.log(res.data);
+
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Successful',
+            detail: 'ExtraShipment Created',
+            life: 3000,
+          });
+        },
+        error: (err: any) => {
+          console.log(err);
+
+        },
+
+
+      });
+
+
+    }
+  }
+
+
 
   getAllMainShipments() {
     this.shipmentService.getAllMainShipments().subscribe({
       next: (resposnse) => {
         this.shipments = resposnse;
         console.log(this.shipments);
+        this.filteredShipments = this.shipments
       },
       error: (err) => {
         console.log(err);
@@ -118,43 +280,14 @@ export class ViewAllShipmentsComponent {
 
 
 
-  // deleteSecondaryMember(SubscriptionsPara: any) {
-  //   console.log(SubscriptionsPara.id);
-  //   this.confirmationService.confirm({
-  //     message:
-  //       'هل متأكد من مسح الاشتراك ' +
-  //       SubscriptionsPara.attributes.SubType +
-  //       ' من نوع العضو ' +
-  //       SubscriptionsPara.attributes.MemberType +
-  //       ' ?',
-  //     header: 'مسح',
-  //     icon: 'pi pi-exclamation-triangle',
-  //     accept: () => {
-  //       this.subscriptionServices
-  //         .deletesubscriptions(SubscriptionsPara.id)
-  //         .subscribe({
-  //           next: (resposnse) => {
-  //             console.log(resposnse);
-  //             this.subscriptions = this.subscriptions.filter((values) => {
-  //               values.id !== SubscriptionsPara.id;
-  //             });
-  //             this.subscription = null;
-  //             this.messageService.add({
-  //               severity: 'success',
-  //               summary: 'Successful',
-  //               detail: 'تم مسح الاشتراك ',
-  //               life: 3000,
-  //             });
+  goToExtraShipment(mainShipment: any) {
+    this.shipmentService.setShipmentData(mainShipment)
+    localStorage.setItem('shipmentData', JSON.stringify(mainShipment));
 
-  //             this.getAllSub();
-  //           },
-  //           error: (err) => {
-  //             console.log(err);
-  //           },
-  //         });
-  //     },
-  //   });
-  // }
+    this.router.navigate(['/shipment-details']);
+  }
+
+
   editMainShipment(mainShipment: any) {
     this.mainShipment = { ...mainShipment };
     this.shipmentDailogue = true;
@@ -175,6 +308,11 @@ export class ViewAllShipmentsComponent {
     this.updatedMainShipment = mainShipment
   }
 
+
+
+
+
+
   closeExtraDialoge() {
     this.extraShipment = false;
 
@@ -182,6 +320,8 @@ export class ViewAllShipmentsComponent {
   openStatusDialoge(mainShipment: any) {
     this.statusUpdateDialog = true;
     this.updatedMainShipment = mainShipment
+    console.log(this.updatedMainShipment);
+
 
   }
 
@@ -191,32 +331,32 @@ export class ViewAllShipmentsComponent {
   }
 
 
-  updateShipmentStatus() {
-    // console.log(this.updatedMainShipment);
-    let MainShipment = this.updatedMainShipment
+  // updateShipmentStatus() {
+  //   // console.log(this.updatedMainShipment);
+  //   let MainShipment = this.updatedMainShipment
 
-    const Body = {
-      location: this.place,
-      mainShipmentId: MainShipment.id,
-      notes: this.notes,
-    }
+  //   const Body = {
+  //     location: this.place,
+  //     mainShipmentId: MainShipment.id,
+  //     notes: this.notes,
+  //   }
 
-    console.log(Body);
-
-
-    this.shipmentService.updateStatus(MainShipment.id, Body).subscribe({
-      next: (res: any) => {
-        console.log(res);
-        this.statusUpdateDialog = false
+  //   console.log(Body);
 
 
-      },
-      error: (err: any) => {
-        console.log(err);
+  //   this.shipmentService.updateStatus(MainShipment.id, Body).subscribe({
+  //     next: (res: any) => {
+  //       console.log(res);
+  //       this.statusUpdateDialog = false
 
-      }
-    })
-  }
+
+  //     },
+  //     error: (err: any) => {
+  //       console.log(err);
+
+  //     }
+  //   })
+  // }
 
   // onSearchInputChange(event: Event) {
   //   if (this.dt) {

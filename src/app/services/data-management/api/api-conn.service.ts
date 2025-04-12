@@ -9,7 +9,7 @@ import { environment } from 'src/environment/environment';
 export class ApiConnService {
   apiUrl = '';
 
-  temp: string = '';
+  temp: string = localStorage.getItem('auth_token');
 
   apiurl = environment.APIURL;
   private errorMessage = 'Some thing wrong occured';
@@ -22,6 +22,27 @@ export class ApiConnService {
 
   }
 
+  fristGetData(endPoint: string, Token: any): Observable<any> {
+    return this.http
+      .get<any>(
+        `${this.apiurl}/${endPoint}`,
+        {
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8',
+            Accept: '*/*',
+            Authorization: 'Bearer ' + Token,
+          },
+        }
+        // httpOptions
+      )
+      .pipe(
+        retry(2),
+        catchError((err) => {
+          console.error(err);
+          return throwError(() => new Error(this.errorMessage));
+        })
+      );
+  }
   getData(endPoint: string): Observable<any> {
     return this.http
       .get<any>(
@@ -128,6 +149,30 @@ export class ApiConnService {
         })
       );
   }
+  deleteExtraShipment(endPoint: string, id: any, cancelReason: any, data: any) {
+    return this.http
+      .post(
+
+        `${this.apiurl}/${endPoint}/${id}/cancel?cancellationReason=${cancelReason}`,
+        data,
+
+        {
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8',
+            Accept: '*/*',
+            Authorization: 'Bearer ' + this.temp,
+          },
+        }
+      )
+      .pipe(
+        // retry(2),
+        catchError((err) => {
+          console.error(err.error.code);
+          //var code = err.error.code;
+          return throwError(() => new Error(err.error.code));
+        })
+      );
+  }
   deleteUser(endPoint: string, id: any, newData: any) {
     return this.http
       .post(
@@ -155,6 +200,29 @@ export class ApiConnService {
 
 
 
+  upadteMainShipmentStatus2(endPoint: string, id: any, newData: any) {
+    return this.http
+      .post(
+
+        `${this.apiurl}/${endPoint}/${id}/Status`,
+        newData,
+        {
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8',
+            Accept: '*/*',
+            Authorization: 'Bearer ' + this.temp,
+          },
+        }
+      )
+      .pipe(
+        // retry(2),
+        catchError((err) => {
+          console.error(err.error.code);
+          //var code = err.error.code;
+          return throwError(() => new Error(err.error.code));
+        })
+      );
+  }
   upadteMainShipmentStatus(endPoint: string, id: any, newData: any) {
     return this.http
       .post(
@@ -222,6 +290,23 @@ export class ApiConnService {
 
 
   updateMainShipmentData(endPoint: string, id: number, updatedData: any) {
+    return this.http
+      .post(`${this.apiurl}/${endPoint}/UpdateMainShipment/${id}`, updatedData, {
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          Accept: '*/*',
+          Authorization: 'Bearer ' + this.temp,
+        },
+      })
+      .pipe(
+        retry(2),
+        catchError((err) => {
+          console.error(err);
+          return throwError(() => new Error(this.errorMessage));
+        })
+      );
+  }
+  updateExtraShipmentData(endPoint: string, id: number, updatedData: any) {
     return this.http
       .post(`${this.apiurl}/${endPoint}/UpdateMainShipment/${id}`, updatedData, {
         headers: {

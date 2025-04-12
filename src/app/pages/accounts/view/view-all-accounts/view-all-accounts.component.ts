@@ -16,12 +16,21 @@ export class ViewAllAccountsComponent {
   @ViewChild('dt') dt: Table;
   sub: string = '';
   user!: any;
+  filteredUsers: any;
+  filtersList: any[] = ['Email', 'Name', "Phone"]
+  filtringMethod: any = 'Email';
+  token: string;
 
   constructor(
     private confirmationService: ConfirmationService,
     private accountService: AccountService,
     private messageService: MessageService
-  ) { }
+  ) {
+    this.token = localStorage.getItem('auth_token')
+    console.log("this is token", this.token);
+
+
+  }
 
   ngOnInit(): void {
 
@@ -29,11 +38,12 @@ export class ViewAllAccountsComponent {
   }
 
   getAllUsers() {
-    this.accountService.getAllUsers().subscribe({
+    this.accountService.getAllUsersForFristOne(this.token).subscribe({
       next: (resposnse) => {
         console.log(resposnse);
 
         this.users = resposnse;
+        this.filteredUsers = this.users
         // console.log(this.users);
       },
       error: (err) => {
@@ -41,6 +51,56 @@ export class ViewAllAccountsComponent {
       },
     });
   }
+
+  getUserID(event: any) {
+    // console.log(event.value);
+    this.filtringMethod = event.value
+
+  }
+
+
+  onUsersFiter(event: any) {
+    // console.log(event.target.value);
+
+
+
+    if (this.filtringMethod == 'Email') {
+
+      this.filteredUsers = this.users.filter((ele: any) => {
+        return String(ele.email).toLowerCase().includes(event.target.value.toLowerCase());
+      })
+    }
+
+    else if (this.filtringMethod == 'Name') {
+
+      this.filteredUsers = this.users.filter((ele: any) => {
+        return String(ele.firstName).toLowerCase().includes(event.target.value.toLowerCase());
+      })
+
+    }
+
+    else if (this.filtringMethod == 'Phone') {
+      this.filteredUsers = this.users.filter((ele: any) => {
+        return String(ele.phoneNumber).includes(event.target.value);
+      });
+
+    }
+
+
+    if (event.target.value == '') {
+      this.filteredUsers = this.users
+    }
+
+
+
+  }
+
+
+
+
+
+
+
   deleteUser(user: any) {
     console.log(user.id);
     let data = {}
